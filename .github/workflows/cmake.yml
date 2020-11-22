@@ -36,7 +36,7 @@ jobs:
           submodules: recursive
 
     - name: vcpkg cache
-      if: env.enabled
+      #if: env.enabled
       id: vcpkgcache
       uses: actions/cache@v2
       with:
@@ -76,7 +76,7 @@ jobs:
       #if: env.enabled
       shell: 'bash'
       run: >        
-        ./vcpkg/vcpkg --version
+        ./vcpkg/vcpkg version
         ./vcpkg/vcpkg --debug install sqlite3 --triplet ${{ matrix.triplet }} 
             
     - name: Create Build Environment
