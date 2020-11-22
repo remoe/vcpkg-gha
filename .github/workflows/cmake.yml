@@ -51,7 +51,8 @@ jobs:
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
       shell: 'bash'
       run: |
-        export VCPKG_INSTALLATION_ROOT=${{ matrix.VCPKG_WORKSPACE }}
+        mv  $VCPKG_INSTALLATION_ROOT c:/vcpkg_unused
+        ls -la c:/
         cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
         cd ${{ matrix.VCPKG_WORKSPACE }}
         git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
