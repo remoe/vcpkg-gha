@@ -47,18 +47,21 @@ jobs:
           !${{ matrix.VCPKG_WORKSPACE }}/downloads
         key: vcpkg-${{ runner.os }}-${{ matrix.triplet }}  
    
+    - name: Remove old vcpkg (windows)
+      shell: 'bash'
+      run: |
+        mv  $VCPKG_INSTALLATION_ROOT c:/vcpkg_unused
+
     - name: Installing vcpkg (windows)
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
       shell: 'bash'
       run: |
-        mv  $VCPKG_INSTALLATION_ROOT c:/vcpkg_unused
-        ls -la c:/
         cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
         cd ${{ matrix.VCPKG_WORKSPACE }}
-        git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
+        #git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
+        git clone https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
         ${{ matrix.VCPKG_WORKSPACE }}/vcpkg/vcpkg version
-        ls -la ${{ matrix.VCPKG_WORKSPACE }}/vcpkg
 
     # This step assumes `vcpkg` has been bootstrapped (run `./vcpkg/bootstrap-vcpkg`)
     - name: 'Setup NuGet Credentials'
