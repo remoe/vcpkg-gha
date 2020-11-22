@@ -6,7 +6,6 @@ env:
   VCPKG_BINARY_SOURCES : 'clear;nuget,GitHub,readwrite'  
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  VCPKG_WORKSPACE: c:/vcpkg
 
 jobs:
   
@@ -24,6 +23,7 @@ jobs:
           - os: 'windows-2019'
             triplet: 'x64-windows'
             mono: ''
+            VCPKG_WORKSPACE: 'c:/vcpkg'
           #- os: 'ubuntu-20.04'
           #  triplet: 'x64-linux'
           #  # To run `nuget.exe` on non-Windows platforms, we must use `mono`.
@@ -39,12 +39,15 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ${{ env.VCPKG_WORKSPACE }}
-        key: vcpkg-${{ matrix.triplet }}
+          ${{ matrix.VCPKG_WORKSPACE }}
+          !${{ matrix.VCPKG_WORKSPACE }}/packages
+          !${{ matrix.VCPKG_WORKSPACE }}/buildtrees
+          !${{ matrix.VCPKG_WORKSPACE }}/downloads
+        key: vcpkg-${{ runner.os }}-${{ matrix.triplet }}
     
     - name: Installing vcpkg (windows)
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
-      working-directory: ${{ env.VCPKG_WORKSPACE }}
+      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       shell: 'bash'
       run: |
         git clone --depth 1 --branch 2020.11 https://github.com/microsoft/vcpkg 
@@ -53,7 +56,7 @@ jobs:
 
     # This step assumes `vcpkg` has been bootstrapped (run `./vcpkg/bootstrap-vcpkg`)
     - name: 'Setup NuGet Credentials'
-      working-directory: ${{ env.VCPKG_WORKSPACE }}
+      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       #if: env.enabled
       shell: 'bash'
       run: >
@@ -67,7 +70,7 @@ jobs:
 
     # Omit this step if you're using manifests
     - name: 'vcpkg package restore'
-      working-directory: ${{ env.VCPKG_WORKSPACE }}
+      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       #if: env.enabled
       shell: 'bash'
       run: >
@@ -89,7 +92,7 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DWIN32_USE_MP=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_WORKSPACE }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      run: cmake $GITHUB_WORKSPACE -DWIN32_USE_MP=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=${{ matrix.VCPKG_WORKSPACE }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: 'Upload cmake configure log artifact'
       uses: actions/upload-artifact@v2
