@@ -58,8 +58,8 @@ jobs:
       run: |
         cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
         cd ${{ matrix.VCPKG_WORKSPACE }}
-        #git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
-        git clone https://github.com/microsoft/vcpkg 
+        git clone --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
+        #git clone https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
         ${{ matrix.VCPKG_WORKSPACE }}/vcpkg/vcpkg version
 
