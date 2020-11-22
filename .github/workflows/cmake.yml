@@ -24,7 +24,7 @@ jobs:
           - os: 'windows-2019'
             triplet: 'x64-windows'
             mono: ''
-            VCPKG_WORKSPACE: '/mnt/c/vcpkg_own'
+            VCPKG_WORKSPACE: 'c:/vcpkg_own'
           #- os: 'ubuntu-20.04'
           #  triplet: 'x64-linux'
           #  # To run `nuget.exe` on non-Windows platforms, we must use `mono`.
@@ -45,13 +45,14 @@ jobs:
           !${{ matrix.VCPKG_WORKSPACE }}/packages
           !${{ matrix.VCPKG_WORKSPACE }}/buildtrees
           !${{ matrix.VCPKG_WORKSPACE }}/downloads
-        key: vcpkg-${{ runner.os }}-${{ matrix.triplet }}
-    
+        key: vcpkg-${{ runner.os }}-${{ matrix.triplet }}  
+   
     - name: Installing vcpkg (windows)
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
-      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       shell: 'bash'
       run: |
+        cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
+        cd ${{ matrix.VCPKG_WORKSPACE }}
         git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
         ./vcpkg version
