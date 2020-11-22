@@ -76,7 +76,8 @@ jobs:
       #if: env.enabled
       shell: 'bash'
       run: >        
-        ./vcpkg/vcpkg --debug --version install sqlite3 --triplet ${{ matrix.triplet }} 
+        ./vcpkg/vcpkg --version
+        ./vcpkg/vcpkg --debug install sqlite3 --triplet ${{ matrix.triplet }} 
             
     - name: Create Build Environment
       #if: env.enabled
