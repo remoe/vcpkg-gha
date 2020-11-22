@@ -36,7 +36,7 @@ jobs:
           submodules: recursive
 
     - name: vcpkg cache
-      #if: env.enabled
+      if: env.enabled
       id: vcpkgcache
       uses: actions/cache@v2
       with:
@@ -51,10 +51,13 @@ jobs:
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
       shell: 'bash'
       run: |
+        export VCPKG_INSTALLATION_ROOT=${{ matrix.VCPKG_WORKSPACE }}
         cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
         cd ${{ matrix.VCPKG_WORKSPACE }}
         git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+        ls -la ${{ matrix.VCPKG_WORKSPACE }}\vcpkg
+        ${{ matrix.VCPKG_WORKSPACE }}\vcpkg\vcpkg version
 
     # This step assumes `vcpkg` has been bootstrapped (run `./vcpkg/bootstrap-vcpkg`)
     - name: 'Setup NuGet Credentials'
