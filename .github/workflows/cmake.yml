@@ -47,13 +47,11 @@ jobs:
           !${{ matrix.VCPKG_WORKSPACE }}/downloads
         key: vcpkg-${{ runner.os }}-${{ matrix.triplet }}
     
-    # https://devblogs.microsoft.com/cppblog/vcpkg-accelerate-your-team-development-environment-with-binary-caching-and-manifests/#example-1-binary-caching-with-github-packages-and-github-actions
     - name: Installing vcpkg (windows)
       if: steps.vcpkgcache.outputs.cache-hit != 'true'
       working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       shell: 'bash'
       run: |
-        rm -rf "$VCPKG_INSTALLATION_ROOT"
         git clone --depth 1 --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
         ./vcpkg version
