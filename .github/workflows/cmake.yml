@@ -60,7 +60,7 @@ jobs:
         cd ${{ matrix.VCPKG_WORKSPACE }}
         #git clone --branch ${{env.VCPKG_VERSION}} https://github.com/microsoft/vcpkg 
         git clone https://github.com/microsoft/vcpkg         
-        git checkout tags/2020.11 vcpkg
+        git checkout tags/2020.11 -C ./vcpkg
         ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
         ${{ matrix.VCPKG_WORKSPACE }}/vcpkg/vcpkg version
 
