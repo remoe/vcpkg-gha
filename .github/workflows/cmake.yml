@@ -24,7 +24,7 @@ jobs:
           - os: 'windows-2019'
             triplet: 'x64-windows'
             mono: ''
-            VCPKG_WORKSPACE: 'c:/vcpkg-${{env.VCPKG_VERSION}}'
+            VCPKG_WORKSPACE: c:/vcpkg-${{env.VCPKG_VERSION}}
           #- os: 'ubuntu-20.04'
           #  triplet: 'x64-linux'
           #  # To run `nuget.exe` on non-Windows platforms, we must use `mono`.
