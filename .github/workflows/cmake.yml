@@ -75,7 +75,7 @@ jobs:
       working-directory: ${{ matrix.VCPKG_WORKSPACE }}
       #if: env.enabled
       shell: 'bash'
-      run: >        
+      run: |        
         ./vcpkg/vcpkg version
         ./vcpkg/vcpkg --debug install sqlite3 --triplet ${{ matrix.triplet }} 
             
