@@ -70,10 +70,10 @@ jobs:
       run: >
         ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
         sources add
-        -source "https://nuget.pkg.github.com/remoe/index.json"
+        -source "https://nuget.pkg.github.com/${{ github.actor }}/index.json"
         -storepasswordincleartext
         -name "GitHub"
-        -username "remoe"
+        -username "${{ github.actor }}"
         -password "${{ secrets.GITHUB_TOKEN }}"
 
     # Omit this step if you're using manifests
