@@ -54,3 +54,59 @@ jobs:
         git clone -b '${{env.VCPKG_VERSION}}' --single-branch --depth 1 https://github.com/microsoft/vcpkg 
         ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
         ${{ matrix.VCPKG_WORKSPACE }}/vcpkg/vcpkg version
+        
+
+    # This step assumes `vcpkg` has been bootstrapped (run `./vcpkg/bootstrap-vcpkg`)
+    - name: 'Setup NuGet Credentials'
+      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
+      #if: env.enabled
+      shell: 'bash'
+      run: >
+        ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
+        sources add
+        -source "https://nuget.pkg.github.com/${{ github.actor }}/index.json"
+        -storepasswordincleartext
+        -name "GitHub"
+        -username "${{ github.actor }}"
+        -password "${{ secrets.GITHUB_TOKEN }}"
+    # Omit this step if you're using manifests
+    - name: 'vcpkg package restore'
+      working-directory: ${{ matrix.VCPKG_WORKSPACE }}
+      #if: env.enabled
+      shell: 'bash'
+      run: |        
+        ./vcpkg/vcpkg version
+        ./vcpkg/vcpkg --debug install sqlite3 --triplet ${{ matrix.triplet }} 
+            
+    - name: Create Build Environment
+      #if: env.enabled
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: |
+        cmake -E make_directory ${{runner.workspace}}/build 
+    - name: Configure CMake
+      #if: env.enabled
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{ runner.workspace }}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake $GITHUB_WORKSPACE -DWIN32_USE_MP=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=${{ matrix.VCPKG_WORKSPACE }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+    - name: 'Upload cmake configure log artifact'
+      uses: actions/upload-artifact@v2
+      if: ${{ failure() }}
+      with:
+        name: cmake-log
+        path: |
+          ${{ runner.workspace }}/build/CMakeCache.txt
+        retention-days: 1
+
+    - name: Build
+      #if: env.enabled
+      working-directory: ${{ runner.workspace }}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE        
