@@ -34,12 +34,13 @@ jobs:
       shell: 'bash'
       run: |
         df -h
-        ls -la /
-        sudo apt list --installed
+        #ls -la /
+        #sudo apt list --installed
         mount 
           echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
           echo "github.workspace = ${{ github.workspace }}"
           echo "pr.ref = ${{github.event.pull_request.head.ref}}"
-          echo "github.ref = ${{ github.ref }}"
+          echo "github.ref   = ${{ github.ref }}"
+          echo "github.actor = ${{ github.actor }}"
           echo "$GITHUB_CONTEXT"
           # mv  $VCPKG_INSTALLATION_ROOT c:/vcpkg_unused
