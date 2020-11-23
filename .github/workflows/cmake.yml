@@ -1,6 +1,6 @@
 name: CMake
 
-on: [push]
+on: [workflow_dispatch]
 
 env:             
   VCPKG_BINARY_SOURCES : 'clear;nuget,GitHub,readwrite'  
