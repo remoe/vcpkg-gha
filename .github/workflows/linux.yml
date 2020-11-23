@@ -1,6 +1,6 @@
 name: Linux CMake
 
-on: [workflow_dispatch]
+on: [push]
 
 env:             
   VCPKG_BINARY_SOURCES : 'clear;nuget,GitHub,readwrite'  
@@ -24,7 +24,7 @@ jobs:
           - os: 'ubuntu-20.04'
             triplet: 'x64-linux'
             mono: 'mono'
-            VCPKG_WORKSPACE: 'c:/vcpkg_own'
+            VCPKG_WORKSPACE: '${{ github.workspace }}/../vcpkg_own'
     steps:       
     - uses: actions/checkout@v2
       with:
@@ -34,7 +34,7 @@ jobs:
       shell: 'bash'
       run: |
         df -h
-        #ls -la /
+        ls -la /mnt
         #sudo apt list --installed
         mount 
           echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
@@ -44,3 +44,13 @@ jobs:
           echo "github.actor = ${{ github.actor }}"
           echo "$GITHUB_CONTEXT"
           # mv  $VCPKG_INSTALLATION_ROOT c:/vcpkg_unused
+     
+    - name: Installing vcpkg
+      if: steps.vcpkgcache.outputs.cache-hit != 'true'
+      shell: 'bash'
+      run: |
+        cmake -E make_directory ${{ matrix.VCPKG_WORKSPACE }}
+        cd ${{ matrix.VCPKG_WORKSPACE }}
+        git clone -b '${{env.VCPKG_VERSION}}' --single-branch --depth 1 https://github.com/microsoft/vcpkg 
+        ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+        ${{ matrix.VCPKG_WORKSPACE }}/vcpkg/vcpkg version
