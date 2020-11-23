@@ -24,7 +24,7 @@ jobs:
           - os: 'ubuntu-20.04'
             triplet: 'x64-linux'
             mono: 'mono'
-            VCPKG_WORKSPACE: '${{ github.workspace }}/../vcpkg_own'
+            VCPKG_WORKSPACE: '/vcpkg_own'
     steps:       
     - uses: actions/checkout@v2
       with:
